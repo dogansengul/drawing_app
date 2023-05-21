@@ -1,11 +1,7 @@
 package com.example.drawingapp
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Color
-import android.graphics.Paint
-import android.graphics.Path
+import android.graphics.*
 import android.icu.text.ListFormatter.Width
 import android.util.AttributeSet
 import android.view.MotionEvent
@@ -60,6 +56,12 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
         if (w > 0 && h > 0) {
             setUpDrawing(w, h)
         }
+    }
+
+    fun clearDrawing() {
+        path.reset()
+        drawingCanvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR)
+        invalidate()
     }
 }
 
