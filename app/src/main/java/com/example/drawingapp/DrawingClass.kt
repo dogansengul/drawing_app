@@ -4,6 +4,8 @@ import android.content.Context
 import android.graphics.*
 import android.icu.text.ListFormatter.Width
 import android.util.AttributeSet
+import android.util.DisplayMetrics
+import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
 import android.widget.Toast
@@ -68,7 +70,8 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
                 path.reset() // Resets the path
             }
         }
-        invalidate() // Calls the function that requests the View to be redrawn. This function triggers the onDraw function.
+        invalidate() // Calls the function that requests the View to be redrawn.
+        // This function triggers the onDraw function.
         return true
     }
 
@@ -112,6 +115,27 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
         invalidate()// Calls function that requests View to be redrawn. This function triggers onDraw function.
     }
 
+    fun setStrokeWidth(newWidth: Float) {
+        paint.strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, newWidth, resources.displayMetrics)
+    }
+
 }
+//The onSizeChanged method is a method that is called when the size of the View changes.
+// This can happen when the View is first created, when the screen is rotated,
+// or when the layout parameters of the View are changed.
+// This method can be used to make necessary adjustments according to the new size of the View.
+
+//For example, in this code, the onSizeChanged method is used to call the setUpDrawing method, ,
+// which creates a bitmap and a canvas according to the width and height of the View.
+// This way, the bitmap and the canvas will always match the size of the View and avoid any scaling or cropping issues.
+
+//The onSizeChanged method takes four parameters: w, h, oldw and oldh.
+// These are the new width, new height, old width and old height of the View respectively.
+// These parameters can be used to compare the old and new sizes and perform different actions accordingly.
+
+//The onSizeChanged method can be tested by changing the orientation of the device or emulator,
+// or by changing the layout parameters of the View in XML or programmatically.
+// For example, you can change the width or height of the View to a fixed value
+// or a percentage of the screen size and see how it affects the drawing.
 
 
