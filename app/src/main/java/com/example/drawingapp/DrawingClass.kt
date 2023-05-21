@@ -17,15 +17,12 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
     private lateinit var canvasBitmap: Bitmap
     private var paint: Paint = Paint(Paint.DITHER_FLAG).apply {
         color = Color.BLACK
-        style = Paint.Style.FILL_AND_STROKE
+        style = Paint.Style.STROKE
         strokeJoin = Paint.Join.ROUND
         strokeCap = Paint.Cap.ROUND
+        strokeWidth = 20f
     }
-    private lateinit var path: Path
-
-    init {
-        path = Path()
-    }
+    private var path: Path = Path()
 
     private fun setUpDrawing(w: Int, h: Int) {
         canvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
