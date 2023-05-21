@@ -2,6 +2,7 @@ package com.example.drawingapp
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Path
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
@@ -10,17 +11,27 @@ import androidx.databinding.DataBindingUtil
 import com.example.drawingapp.databinding.ActivityMainBinding
 import java.io.File
 import java.io.FileOutputStream
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var drawingView: DrawingView
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         drawingView = binding.drawingView
         binding.clearButton.setOnClickListener {
-            drawingView.clearDrawing()
+            drawingView.undo()
         }
+        binding.clearButton.setOnLongClickListener {
+            // Uzun basma işlemleri
+            drawingView.clearDrawing()
+            // true dönerek uzun basmanın diğer olayları engellenir
+            true
+        }
+
         binding.saveButton.setOnClickListener {
             saveDrawing()
         }
