@@ -23,10 +23,10 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageButton"
-        app:layout_constraintVertical_bias="0.156"
+        app:layout_constraintVertical_bias="0.018"
         app:srcCompat="@drawable/medium_size" />
 
     <ImageButton
@@ -38,7 +38,7 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageButton2"
-        app:layout_constraintVertical_bias="0.165"
+        app:layout_constraintVertical_bias="0.02"
         app:srcCompat="@drawable/large_size" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

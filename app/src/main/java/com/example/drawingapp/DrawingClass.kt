@@ -28,7 +28,7 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
         style = Paint.Style.STROKE // Style line
         strokeJoin = Paint.Join.ROUND // Line joins round
         strokeCap = Paint.Cap.ROUND // Line ends round
-        strokeWidth = 20f // Line thickness 20 pixels
+        strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 13f, resources.displayMetrics) // Line thickness 20 pixels
         isAntiAlias = true // Edge smoothing enabled
     }
 
@@ -45,8 +45,8 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         // Draws the bitmap and path on the canvas
-        canvas.drawBitmap(canvasBitmap, 0f, 0f, paint)
-        canvas.drawPath(path, paint)
+        canvas.drawBitmap(canvasBitmap, 0f, 0f, paint) //this part is to hold the drawings
+        canvas.drawPath(path, paint) //this part is to be able to see drawings on instant
 
     }
 
@@ -116,8 +116,16 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
     }
 
     fun setStrokeWidth(newWidth: Float) {
-        paint.strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, newWidth, resources.displayMetrics)
+        paint.strokeWidth = TypedValue.applyDimension(
+            TypedValue.COMPLEX_UNIT_DIP,
+            newWidth,
+            resources.displayMetrics)
     }
+
+    fun setColor(color: Int) {
+        paint.color = color
+    }
+
 
 }
 //The onSizeChanged method is a method that is called when the size of the View changes.

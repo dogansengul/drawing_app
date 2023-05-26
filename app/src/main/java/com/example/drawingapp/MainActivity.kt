@@ -10,6 +10,8 @@ import android.os.Environment
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
+import androidx.core.content.ContextCompat
+import androidx.core.view.get
 import androidx.databinding.DataBindingUtil
 import com.example.drawingapp.databinding.ActivityMainBinding
 import java.io.File
@@ -21,11 +23,21 @@ class MainActivity : AppCompatActivity() {
     private lateinit var drawingView: DrawingView
     private lateinit var showBrushSizeDialog: Dialog
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         drawingView = binding.drawingView
+
+        binding.black.setOnClickListener { drawingView.setColor(ContextCompat.getColor(this, R.color.black)) ; binding.black.setImageResource(R.drawable.pallet_pressed)}
+        binding.blue.setOnClickListener { drawingView.setColor(ContextCompat.getColor(this, R.color.blue)) ; binding.blue.setImageResource(R.drawable.pallet_pressed)}
+        binding.yellow.setOnClickListener { drawingView.setColor(ContextCompat.getColor(this, R.color.yellow)) ; binding.yellow.setImageResource(R.drawable.pallet_pressed)}
+        binding.purple.setOnClickListener { drawingView.setColor(ContextCompat.getColor(this, R.color.purple)) ; binding.purple.setImageResource(R.drawable.pallet_pressed)}
+        binding.green.setOnClickListener { drawingView.setColor(ContextCompat.getColor(this, R.color.green)) ; binding.green.setImageResource(R.drawable.pallet_pressed)}
+        binding.red.setOnClickListener { drawingView.setColor(ContextCompat.getColor(this, R.color.red)); binding.red.setImageResource(R.drawable.pallet_pressed)}
+        binding.orange.setOnClickListener { drawingView.setColor(ContextCompat.getColor(this, R.color.red)); binding.orange.setImageResource(R.drawable.pallet_pressed)}
+
+
+        //buttons' methods
         binding.clearButton.setOnClickListener {
             drawingView.undo()
         }
@@ -35,11 +47,9 @@ class MainActivity : AppCompatActivity() {
             // true dönerek uzun basmanın diğer olayları engellenir
             true
         }
-
         binding.saveButton.setOnClickListener {
             saveDrawing()
         }
-
         binding.brushSizeButton.setOnClickListener {
             showBrushSizeChooserDialog()
         }
