@@ -28,13 +28,84 @@ class MainActivity : AppCompatActivity() {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
         drawingView = binding.drawingView
 
-        binding.black.setOnClickListener { drawingView.setColor(ContextCompat.getColor(this, R.color.black)) ; binding.black.setImageResource(R.drawable.pallet_pressed)}
-        binding.blue.setOnClickListener { drawingView.setColor(ContextCompat.getColor(this, R.color.blue)) ; binding.blue.setImageResource(R.drawable.pallet_pressed)}
-        binding.yellow.setOnClickListener { drawingView.setColor(ContextCompat.getColor(this, R.color.yellow)) ; binding.yellow.setImageResource(R.drawable.pallet_pressed)}
-        binding.purple.setOnClickListener { drawingView.setColor(ContextCompat.getColor(this, R.color.purple)) ; binding.purple.setImageResource(R.drawable.pallet_pressed)}
-        binding.green.setOnClickListener { drawingView.setColor(ContextCompat.getColor(this, R.color.green)) ; binding.green.setImageResource(R.drawable.pallet_pressed)}
-        binding.red.setOnClickListener { drawingView.setColor(ContextCompat.getColor(this, R.color.red)); binding.red.setImageResource(R.drawable.pallet_pressed)}
-        binding.orange.setOnClickListener { drawingView.setColor(ContextCompat.getColor(this, R.color.red)); binding.orange.setImageResource(R.drawable.pallet_pressed)}
+        //color pallet buttons click events
+        binding.black.setOnClickListener {
+            drawingView.setColor(ContextCompat.getColor(this, R.color.black))
+            binding.black.setImageResource(R.drawable.pallet_pressed)
+
+            binding.blue.setImageResource(R.drawable.pallet_normal)
+            binding.yellow.setImageResource(R.drawable.pallet_normal)
+            binding.purple.setImageResource(R.drawable.pallet_normal)
+            binding.green.setImageResource(R.drawable.pallet_normal)
+            binding.red.setImageResource(R.drawable.pallet_normal)
+            binding.orange.setImageResource(R.drawable.pallet_normal)
+        }
+        binding.blue.setOnClickListener {
+            drawingView.setColor(ContextCompat.getColor(this, R.color.blue))
+            binding.blue.setImageResource(R.drawable.pallet_pressed)
+
+            binding.black.setImageResource(R.drawable.pallet_normal)
+            binding.yellow.setImageResource(R.drawable.pallet_normal)
+            binding.purple.setImageResource(R.drawable.pallet_normal)
+            binding.green.setImageResource(R.drawable.pallet_normal)
+            binding.red.setImageResource(R.drawable.pallet_normal)
+            binding.orange.setImageResource(R.drawable.pallet_normal)
+        }
+        binding.yellow.setOnClickListener {
+            drawingView.setColor(ContextCompat.getColor(this, R.color.yellow))
+            binding.yellow.setImageResource(R.drawable.pallet_pressed)
+
+            binding.black.setImageResource(R.drawable.pallet_normal)
+            binding.blue.setImageResource(R.drawable.pallet_normal)
+            binding.purple.setImageResource(R.drawable.pallet_normal)
+            binding.green.setImageResource(R.drawable.pallet_normal)
+            binding.red.setImageResource(R.drawable.pallet_normal)
+            binding.orange.setImageResource(R.drawable.pallet_normal)
+        }
+        binding.purple.setOnClickListener {
+            drawingView.setColor(ContextCompat.getColor(this, R.color.purple))
+            binding.purple.setImageResource(R.drawable.pallet_pressed)
+
+            binding.black.setImageResource(R.drawable.pallet_normal)
+            binding.blue.setImageResource(R.drawable.pallet_normal)
+            binding.yellow.setImageResource(R.drawable.pallet_normal)
+            binding.green.setImageResource(R.drawable.pallet_normal)
+            binding.red.setImageResource(R.drawable.pallet_normal)
+            binding.orange.setImageResource(R.drawable.pallet_normal)
+        }
+        binding.green.setOnClickListener {
+            drawingView.setColor(ContextCompat.getColor(this, R.color.green))
+            binding.green.setImageResource(R.drawable.pallet_pressed)
+
+            binding.black.setImageResource(R.drawable.pallet_normal)
+            binding.blue.setImageResource(R.drawable.pallet_normal)
+            binding.yellow.setImageResource(R.drawable.pallet_normal)
+            binding.purple.setImageResource(R.drawable.pallet_normal)
+            binding.red.setImageResource(R.drawable.pallet_normal)
+            binding.orange.setImageResource(R.drawable.pallet_normal)
+        }
+        binding.red.setOnClickListener {
+            drawingView.setColor(ContextCompat.getColor(this, R.color.red))
+            binding.red.setImageResource(R.drawable.pallet_pressed)
+
+            binding.black.setImageResource(R.drawable.pallet_normal)
+            binding.blue.setImageResource(R.drawable.pallet_normal)
+            binding.yellow.setImageResource(R.drawable.pallet_normal)
+            binding.purple.setImageResource(R.drawable.pallet_normal)
+            binding.green.setImageResource(R.drawable.pallet_normal)
+            binding.orange.setImageResource(R.drawable.pallet_normal)
+        }
+        binding.orange.setOnClickListener {
+            drawingView.setColor(ContextCompat.getColor(this, R.color.orange))
+            binding.orange.setImageResource(R.drawable.pallet_pressed)
+
+            binding.black.setImageResource(R.drawable.pallet_normal)
+            binding.blue.setImageResource(R.drawable.pallet_normal)
+            binding.yellow.setImageResource(R.drawable.pallet_normal)
+            binding.purple.setImageResource(R.drawable.pallet_normal)
+            binding.green.setImageResource(R.drawable.pallet_normal)
+            binding.red.setImageResource(R.drawable.pallet_normal)
+        }
 
 
         //buttons' methods
