@@ -4,4 +4,8 @@
     <string name="todo2">TODO</string>
     <string name="brushSize_button">brushSize_button</string>
     <string name="red1">red</string>
+    <string name="permission_title">Depolama İzni</string>
+    <string name="permission_message">Uygulamamızın galeriye erişebilmesi için depolama izni gerekmektedir.</string>
+    <string name="permission_positive_button">Tamam</string>
+    <string name="permission_negative_button">İptal</string>
 </resources>

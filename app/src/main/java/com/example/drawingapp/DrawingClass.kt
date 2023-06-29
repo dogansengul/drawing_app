@@ -22,6 +22,8 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
     private var path: Path = Path()
     // The Stack object that we use to undo the drawings that the user made
     private val undoStack: Stack<Path> = Stack()
+    // The stack object that we use to undo the drawings with its color
+    private val paintStack: Stack<Paint> = Stack()
     // The Paint object that we use to draw
     private var paint: Paint = Paint(Paint.DITHER_FLAG).apply {
         color = Color.BLACK // Color black
@@ -67,6 +69,7 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
             MotionEvent.ACTION_UP -> { // Runs when lifting your finger off the screen
                 drawingCanvas.drawPath(path, paint) // Draws the path on the canvas
                 undoStack.push(Path(path)) // Adds the path to the undo stack
+                paintStack.push(Paint(paint))
                 path.reset() // Resets the path
             }
         }
@@ -88,6 +91,7 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
     fun undo() {
         if (undoStack.isNotEmpty()) { // If the undo stack is not empty
             undoStack.pop() // Removes the last added path
+            paintStack.pop()
             redrawDrawing() // Redraws the drawing
         }
     }
@@ -95,14 +99,15 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
     // Helper function that draws all paths in undo stack on canvas
     private fun redrawDrawing() {
         // Clears all drawing
-        drawingCanvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR)
-
         // Draws paths in undo stack
-        for (path in undoStack) {
-            drawingCanvas.drawPath(path, paint)
+        drawingCanvas.drawColor(Color.WHITE, PorterDuff.Mode.CLEAR)
+        val currentPaint = paint
+        for (i in 0 until undoStack.size) {
+            paint = paintStack[i]
+            drawingCanvas.drawPath(undoStack[i], paint)
         }
-
         invalidate()// Calls the function that requests View to be redrawn. This function triggers onDraw function.
+        paint = currentPaint
     }
 
 
