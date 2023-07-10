@@ -1,10 +1,9 @@
 package com.example.drawingapp
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.*
-import android.icu.text.ListFormatter.Width
 import android.util.AttributeSet
-import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.MotionEvent
 import android.view.View
@@ -33,11 +32,16 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
         strokeWidth = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 13f, resources.displayMetrics) // Line thickness 20 pixels
         isAntiAlias = true // Edge smoothing enabled
     }
+    private var viewHeight: Int = 0
+    private var viewWidth: Int = 0
+    private lateinit var actualCanvas: Canvas
 
 
     // The function that makes the necessary settings for the class to run at the beginning
     private fun setUpDrawing(w: Int, h: Int) {
         // Creates a bitmap according to the width and height it receives as a parameter
+        viewHeight = h
+        viewWidth = w
         canvasBitmap = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888)
         // Assigns the created bitmap to the canvas
         drawingCanvas = Canvas(canvasBitmap)
@@ -49,10 +53,11 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
         // Draws the bitmap and path on the canvas
         canvas.drawBitmap(canvasBitmap, 0f, 0f, paint) //this part is to hold the drawings
         canvas.drawPath(path, paint) //this part is to be able to see drawings on instant
-
+        actualCanvas = canvas
     }
 
     // The function that handles the user's touch events on the screen
+    @SuppressLint("ClickableViewAccessibility")
     override fun onTouchEvent(event: MotionEvent): Boolean {
         val x = event.x // The x coordinate of the touched point
         val y = event.y // The y coordinate of the touched point

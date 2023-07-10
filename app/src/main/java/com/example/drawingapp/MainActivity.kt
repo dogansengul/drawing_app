@@ -11,12 +11,16 @@ import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
+import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.provider.Settings
+import android.view.View
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
@@ -27,6 +31,10 @@ import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.drawingapp.databinding.ActivityMainBinding
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 
@@ -34,6 +42,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
     private lateinit var drawingView: DrawingView
     private lateinit var showBrushSizeDialog: Dialog
+    private var progressDialog: Dialog? = null
     private val requestPermission: ActivityResultLauncher<Array<String>> =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()){
             it ->
@@ -59,7 +68,13 @@ class MainActivity : AppCompatActivity() {
         val pickGalleryIntent = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
         openGalleryLauncher.launch(pickGalleryIntent)
     }
-
+    private fun isReadStorageAllowed(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            checkSelfPermission(Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
+        } else {
+            checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main)
@@ -154,13 +169,18 @@ class MainActivity : AppCompatActivity() {
             true
         }
         binding.saveButton.setOnClickListener {
-            saveDrawing()
+            lifecycleScope.launch{
+                if(isReadStorageAllowed()){
+                    showProgressDialog()
+                    saveBitmapFile(getBitmapFromView(findViewById(R.id.frame_layout)))
+                }
+            }
         }
         binding.brushSizeButton.setOnClickListener {
             showBrushSizeChooserDialog()
         }
         binding.galleryButton.setOnClickListener {
-            if(android.os.Build.VERSION.SDK_INT > android.os.Build.VERSION_CODES.S_V2){
+            if(Build.VERSION.SDK_INT > Build.VERSION_CODES.S_V2){
                 requestPermissionAndOpenGallery(Manifest.permission.READ_MEDIA_IMAGES)
             } else {
                 requestPermissionAndOpenGallery(Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -180,7 +200,6 @@ class MainActivity : AppCompatActivity() {
             requestPermission.launch(arrayOf(permission))
         }
     }
-
     private fun showBrushSizeChooserDialog() {
         showBrushSizeDialog = Dialog(this)
         showBrushSizeDialog.setContentView(R.layout.brush_size_dialog)
@@ -201,26 +220,81 @@ class MainActivity : AppCompatActivity() {
             showBrushSizeDialog.dismiss()
         }
     }
-    private fun saveDrawing() {
-        val bitmap = Bitmap.createBitmap(drawingView.width, drawingView.height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        drawingView.draw(canvas)
-
-        val fileName = "drawing_${System.currentTimeMillis()}.png"
-        val directory = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
-        val file = File(directory, fileName)
-
-        try {
-            val outputStream = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-            outputStream.flush()
-            outputStream.close()
-            Toast.makeText(this, "Çizim kaydedildi: ${file.absolutePath}", Toast.LENGTH_SHORT).show()
-        } catch (e: Exception) {
-            Toast.makeText(this, "Çizim kaydedilirken hata oluştu", Toast.LENGTH_SHORT).show()
-            e.printStackTrace()
+    private fun getBitmapFromView(view: View): Bitmap {
+        val returnedBitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(returnedBitmap)
+        val background = view.background
+        if(background != null) {
+            background.draw(canvas)
+        } else{
+            canvas.drawColor(Color.WHITE)
         }
+        view.draw(canvas)
+        return returnedBitmap
+    }
+    private suspend fun saveBitmapFile(bitmap: Bitmap?): String {
+        var result = ""
+        withContext(Dispatchers.IO) {
+            if(bitmap != null) {
+                try {
+                    val bytes = ByteArrayOutputStream()
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 90, bytes)
+                    val file = File(
+                        externalCacheDir?.absoluteFile.toString()
+                                + File.separator + "DrawingApp_"
+                                + System.currentTimeMillis() / 1000 + ".png"
+                    )
+                    val fo = FileOutputStream(file)
+                    fo.write(bytes.toByteArray())
+                    fo.close()
+
+                    result = file.absolutePath
+                    runOnUiThread {
+                        cancelDialog()
+                        if (result.isNotEmpty()) {
+                            Toast.makeText(
+                                applicationContext,
+                                "File saved succesfully. $result",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            shareImage(result)
+                        } else {
+                            Toast.makeText(
+                                applicationContext,
+                                "Something went wrong.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    }
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
+        return result
+
     }
 
+    private fun showProgressDialog() {
+        progressDialog = Dialog(this)
+        progressDialog?.setContentView(R.layout.progress_dialog)
+        progressDialog?.show()
+    }
+    private fun cancelDialog() {
+        if(progressDialog != null) {
+            progressDialog!!.dismiss()
+            progressDialog = null
+        }
 
+    }
+    private fun shareImage(result: String) {
+        MediaScannerConnection.scanFile(this, arrayOf(result),null) {
+            path, uri ->
+            val shareIntent = Intent()
+            shareIntent.action = Intent.ACTION_SEND
+            shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
+            shareIntent.type = "image/png"
+            startActivity(Intent.createChooser(shareIntent, "Share"))
+        }
+     }
 }
