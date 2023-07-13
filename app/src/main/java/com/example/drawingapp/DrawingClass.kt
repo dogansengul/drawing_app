@@ -135,6 +135,9 @@ class DrawingView(context: Context, attrs: AttributeSet) : View(context, attrs) 
     fun setColor(color: Int) {
         paint.color = color
     }
+    fun getWidthAndHeight(): Array<Int> {
+        return arrayOf(viewWidth, viewHeight)
+    }
 
 
 }

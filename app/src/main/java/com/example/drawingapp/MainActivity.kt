@@ -1,13 +1,10 @@
 package com.example.drawingapp
 
 import android.Manifest
-import android.app.Activity
 import android.app.AlertDialog
 import android.app.Dialog
-import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -15,28 +12,26 @@ import android.graphics.Color
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.os.Environment
 import android.provider.MediaStore
-import android.provider.Settings
 import android.view.View
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.lifecycleScope
 import com.example.drawingapp.databinding.ActivityMainBinding
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
+import java.lang.Float.min
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
@@ -57,10 +52,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
     private val openGalleryLauncher: ActivityResultLauncher<Intent> =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-            result ->
-            if(result.resultCode == RESULT_OK && result.data != null){
-                binding.imageView.setImageURI(result.data?.data)
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+            if (result.resultCode == RESULT_OK && result.data != null) {
+                val selectedImageUri = result.data?.data
+                val bitmap = MediaStore.Images.Media.getBitmap(contentResolver, selectedImageUri)
+                val resizedBitmap = resizeBitmap(bitmap, drawingView.getWidthAndHeight()[0], drawingView.getWidthAndHeight()[1])
+                binding.imageView.setImageBitmap(resizedBitmap)
             }
         }
     private fun openGallery() {
@@ -244,6 +241,7 @@ class MainActivity : AppCompatActivity() {
                                 + File.separator + "DrawingApp_"
                                 + System.currentTimeMillis() / 1000 + ".png"
                     )
+
                     val fo = FileOutputStream(file)
                     fo.write(bytes.toByteArray())
                     fo.close()
@@ -272,7 +270,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return result
-
     }
 
     private fun showProgressDialog() {
@@ -285,16 +282,35 @@ class MainActivity : AppCompatActivity() {
             progressDialog!!.dismiss()
             progressDialog = null
         }
-
     }
-    private fun shareImage(result: String) {
-        MediaScannerConnection.scanFile(this, arrayOf(result),null) {
-            path, uri ->
-            val shareIntent = Intent()
-            shareIntent.action = Intent.ACTION_SEND
-            shareIntent.putExtra(Intent.EXTRA_STREAM, uri)
-            shareIntent.type = "image/png"
-            startActivity(Intent.createChooser(shareIntent, "Share"))
-        }
-     }
+    private fun shareImage(filePath: String) {
+        // Create an intent to share the image.
+        val intent = Intent(Intent.ACTION_SEND)
+        intent.type = "image/png"
+
+        // Get the Uri of the image to share.
+        val fileUri = FileProvider.getUriForFile(
+            applicationContext,
+            "com.example.drawingapp.fileprovider",
+            File(filePath)
+        )
+        intent.putExtra(Intent.EXTRA_STREAM, fileUri)
+
+        // Grant permission to the receiving app to read the shared file
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+        // Show a chooser dialog so the user can select which app to share with.
+        startActivity(Intent.createChooser(intent, "Share Image"))
+    }
+
+    private fun resizeBitmap(bitmap: Bitmap, maxWidth: Int, maxHeight: Int): Bitmap {
+        val width = bitmap.width
+        val height = bitmap.height
+
+        val scaleFactor = min(maxWidth.toFloat() / width, maxHeight.toFloat() / height)
+        val scaledWidth = (width * scaleFactor).toInt()
+        val scaledHeight = (height * scaleFactor).toInt()
+
+        return Bitmap.createScaledBitmap(bitmap, scaledWidth, scaledHeight, true)
+    }
 }
